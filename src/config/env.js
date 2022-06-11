@@ -1,0 +1,8 @@
+import {
+  API_CMC_KEY as API_CMC_KEY_ENV,
+  API_MESSARI_KEY as API_MESSARI_KEY_ENV,
+} from '@env';
+
+export const API_CMC_KEY = API_CMC_KEY_ENV;
+
+export const API_MESSARI_KEY = API_MESSARI_KEY_ENV;
