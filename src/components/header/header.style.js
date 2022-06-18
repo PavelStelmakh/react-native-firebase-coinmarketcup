@@ -7,6 +7,7 @@ export const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     paddingHorizontal: 10,
+    justifyContent: 'space-between',
   },
   headerFontColor: {
     color: '#fff',
@@ -18,5 +19,8 @@ export const styles = StyleSheet.create({
     marginRight: 4,
     width: 20,
     height: 20,
+  },
+  headerTitle: {
+    flexDirection: 'row',
   },
 });

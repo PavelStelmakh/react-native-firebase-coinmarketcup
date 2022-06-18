@@ -2,12 +2,12 @@ import { useState, useMemo } from 'react';
 import { Alert } from 'react-native';
 import { identity } from 'ramda';
 import { parseQueryParameters } from '../utils/query-parameters';
-import { API_CMC_KEY, API_MESSARI_KEY } from '../config';
+import { CMC_API_KEY, MESSARI_API_KEY } from '../config';
 
 const DEFAULT_HEADERS = {
   Accepts: 'application/json',
-  'X-CMC_PRO_API_KEY': API_CMC_KEY,
-  'x-messari-api-key': API_MESSARI_KEY,
+  'X-CMC_PRO_API_KEY': CMC_API_KEY,
+  'x-messari-api-key': MESSARI_API_KEY,
 };
 
 class Fetch {
