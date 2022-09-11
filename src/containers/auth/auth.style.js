@@ -45,4 +45,14 @@ export const styles = StyleSheet.create({
   formElement: {
     marginBottom: 25,
   },
+  loginWithElement: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  signInIcon: {
+    width: 48,
+    height: 48,
+    marginLeft: 10,
+  },
 });

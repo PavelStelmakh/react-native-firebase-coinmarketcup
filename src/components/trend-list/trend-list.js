@@ -3,7 +3,7 @@ import { FlatList, RefreshControl } from 'react-native';
 import { TrendItem } from '../trend-item';
 
 const renderItem = ({ item, index }) => (
-  <TrendItem key={item.id} {...item} number={index + 1} />
+  <TrendItem key={item.symbol} {...item} number={index + 1} />
 );
 
 export const TrendList = ({ trends, loading, onRefresh }) => (
@@ -13,6 +13,6 @@ export const TrendList = ({ trends, loading, onRefresh }) => (
       <RefreshControl refreshing={loading} onRefresh={onRefresh} />
     }
     renderItem={renderItem}
-    keyExtractor={item => item.id}
+    keyExtractor={item => item.symbol}
   />
 );

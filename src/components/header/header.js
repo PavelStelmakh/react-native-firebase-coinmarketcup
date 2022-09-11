@@ -1,10 +1,9 @@
 import React from 'react';
 import { Text, View, TouchableHighlight, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { signOut } from 'firebase/auth';
+import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/Octicons';
 import { selectIsLogin, deleteUserData } from '../../stores/user';
-import { auth } from '../../config';
 import CoinMarketCupIcon from '../../assets/coinmarketcap.svg';
 import { styles } from './header.style';
 
@@ -13,7 +12,8 @@ export const Header = () => {
   const isLogin = useSelector(selectIsLogin);
 
   const handleLogOut = () => {
-    signOut(auth)
+    auth()
+      .signOut()
       .then(() => {
         dispatch(deleteUserData());
       })

@@ -7,4 +7,15 @@ export const selectUser = createSelector(
   ({ userData }) => userData,
 );
 
+export const selectTrendPreferences = createSelector(
+  selectUserStore,
+  ({ trendPreferences }) => trendPreferences,
+);
+
 export const selectIsLogin = createSelector(selectUser, Boolean);
+
+export const selectTrendPreferencesMap = createSelector(
+  selectTrendPreferences,
+  trendPreferences =>
+    Object.fromEntries(trendPreferences.map(pref => [pref.coinId, pref])),
+);

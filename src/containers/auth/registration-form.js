@@ -9,8 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../config';
+import auth from '@react-native-firebase/auth';
 import { TabView } from '../../components/tab-view';
 import { useSecureStorage } from '../../hooks/use-secure-storage';
 import { setUserData } from '../../stores/user';
@@ -24,7 +23,8 @@ export const RegistrationForm = () => {
   const { setItem } = useSecureStorage();
 
   const handleRegistration = () => {
-    createUserWithEmailAndPassword(auth, email, password)
+    auth()
+      .createUserWithEmailAndPassword(email, password)
       .then(({ user }) => {
         dispatch(setUserData(getUserData(user)));
 

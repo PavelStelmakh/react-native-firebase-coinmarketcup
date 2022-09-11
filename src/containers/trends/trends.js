@@ -1,34 +1,54 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useCallback } from 'react';
 import { ActivityIndicator } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 import { createStackNavigator } from '@react-navigation/stack';
+import firestore from '@react-native-firebase/firestore';
 import { TabView } from '../../components/tab-view';
 import { TrendList } from '../../components/trend-list';
 import { useFetch } from '../../hooks/use-fetch';
+import {
+  selectUser,
+  selectTrendPreferencesMap,
+  setTrendPreferences,
+  addTrendPreference,
+  deleteTrendPreference,
+} from '../../stores/user';
 
 import { Home } from '../home';
 
 const Stack = createStackNavigator();
 
 export const Trends = ({ navigation }) => {
-  const [markedTrends, setMarkedTrends] = useState({});
+  const dispatch = useDispatch();
+  const userData = useSelector(selectUser);
+  const markedTrends = useSelector(selectTrendPreferencesMap);
 
   const handleTrendMark = useCallback(
-    (id, mark) => {
-      setMarkedTrends(state => {
-        const newState = { ...state, [id]: mark };
+    (trend, mark) => {
+      if (mark) {
+        const docData = {
+          userId: userData.uid,
+          coinId: trend,
+        };
+        firestore()
+          .collection('TrendPreferences')
+          .add(docData)
+          .then(newDoc =>
+            dispatch(addTrendPreference({ id: newDoc.id, ...docData })),
+          )
+          .catch(error => console.error(error));
+      } else {
+        const docId = markedTrends[trend].id;
 
-        AsyncStorage.setItem(
-          '@preferences',
-          JSON.stringify({
-            markedTrends: newState,
-          }),
-        );
-
-        return newState;
-      });
+        firestore()
+          .collection('TrendPreferences')
+          .doc(docId)
+          .delete()
+          .then(() => dispatch(deleteTrendPreference(docId)))
+          .catch(error => console.error(error));
+      }
     },
-    [setMarkedTrends],
+    [markedTrends],
   );
 
   const selectTrends = useCallback(
@@ -43,7 +63,7 @@ export const Trends = ({ navigation }) => {
             symbol,
             name: rest.name,
           }),
-        marked: markedTrends[symbol],
+        marked: Boolean(markedTrends[symbol]),
         price: usd.price,
         percentChange: usd.percent_change_24h,
         marketCapital: usd.market_cap,
@@ -54,15 +74,17 @@ export const Trends = ({ navigation }) => {
 
   const { loading, onFetch, data, fetchBuilder } = useFetch(selectTrends);
 
-  const loadLocalPreferences = () =>
-    AsyncStorage.getItem('@preferences').then(store => {
-      console.log(store);
-      if (store) {
-        const { markedTrends: storedMarketTrends } = JSON.parse(store) || {};
-
-        setMarkedTrends(storedMarketTrends);
-      }
-    });
+  const loadLocalPreferences = async () => {
+    firestore()
+      .collection('TrendPreferences')
+      .where('userId', '==', userData.uid)
+      .get()
+      .then(({ docs }) => docs.map(doc => ({ id: doc.id, ...doc.data() })))
+      .then(docs => {
+        dispatch(setTrendPreferences(docs));
+      })
+      .catch(error => console.error(error));
+  };
 
   useEffect(() => {
     loadLocalPreferences();

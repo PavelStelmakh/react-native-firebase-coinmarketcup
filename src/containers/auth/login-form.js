@@ -9,8 +9,11 @@ import {
   Alert,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../config';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+} from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
 import { TabView } from '../../components/tab-view';
 import { useSecureStorage } from '../../hooks/use-secure-storage';
 import { setUserData } from '../../stores/user';
@@ -24,11 +27,28 @@ export const LoginForm = () => {
   const { setItem } = useSecureStorage();
 
   const handleLogin = () => {
-    signInWithEmailAndPassword(auth, email, password)
+    auth()
+      .signInWithEmailAndPassword(email, password)
       .then(({ user }) => {
         dispatch(setUserData(getUserData(user)));
 
         return setItem('user-data', user);
+      })
+      .catch(err => {
+        Alert.alert(err.message);
+      });
+  };
+
+  const handleGoogleLogin = () => {
+    GoogleSignin.signIn()
+      .then(({ idToken, user }) => {
+        const userData = { ...user, uid: user.id };
+        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+        auth().signInWithCredential(googleCredential);
+
+        dispatch(setUserData(getUserData(userData)));
+        setItem('user-data', userData);
       })
       .catch(err => {
         Alert.alert(err.message);
@@ -66,8 +86,15 @@ export const LoginForm = () => {
           <Pressable style={styles.button} onPress={handleLogin}>
             <Text style={styles.label}>Sign In</Text>
           </Pressable>
-          <View style={styles.formElement}>
-            <Text style={styles.label}>Log in with:</Text>
+          <View style={[styles.formElement, styles.loginWithElement]}>
+            <Text style={styles.label}>Login with:</Text>
+            <GoogleSigninButton
+              style={styles.signInIcon}
+              size={GoogleSigninButton.Size.Icon}
+              color={GoogleSigninButton.Color.Dark}
+              onPress={handleGoogleLogin}
+              // disabled={this.state.isSigninInProgress}
+            />
           </View>
         </View>
       </TouchableWithoutFeedback>
